@@ -9,7 +9,11 @@ os.environ['FLASK_ENV'] = 'development'
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
+
+
 app = Flask(__name__)
+
+app.secret_key = 'your secret key'
 
 # bp = Blueprint('app', __name__, url_prefix='/app')
 
@@ -31,9 +35,9 @@ def login():
 
         conn = db.connect(current_dir +'\database.db')
         cur = conn.cursor()
-        cur.execute('SELECT * FROM users WHERE username=?', (username,))
+        cur.execute(f'SELECT * FROM users WHERE username= ? AND password= ?', (username, password,))
         user = cur.fetchone()
-        if user:
+        if user and check_password_hash(user[2], password):
             session['loggedin'] = True
             session['id'] = user['id']
             session['username'] = user['username']
@@ -52,23 +56,23 @@ def signup():
         password = request.form['password']
         email = request.form['email']
         print(username, password, email)
-        conn = db.connect(current_dir +'\database.db')
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM users WHERE username = % s", (username,))
-        user = cur.fetchone()   
+        # conn = db.connect(current_dir +'\database.db')
+        # cur = conn.cursor()
+        # cur.execute('SELECT * FROM users WHERE username = ?', username)
+        # user = cur.fetchone()   
         
-        if user:
-            msg = 'Username already exists'
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-            msg = 'Invalid email address !'
-        elif not re.match(r'[A-Za-z0-9]+', username):
-            msg = 'Username must contain only characters and numbers !'
-        elif not username or not password or not email:
-            msg = 'Please fill all the fields !'
-        else:
-            cur.execute("INSERT INTO database.users (username, password, email) VALUES (% s, % s, % s)", (username, generate_password_hash(password), email))
-            conn.commit()
-            msg = 'Signed up successfully !'
+        # if user:
+        #     msg = 'Username already exists'
+        # elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+        #     msg = 'Invalid email address !'
+        # elif not re.match(r'[A-Za-z0-9]+', username):
+        #     msg = 'Username must contain only characters and numbers !'
+        # elif not username or not password or not email:
+        #     msg = 'Please fill all the fields !'
+        # else:
+        #     cur.execute("INSERT INTO database.users (username, password, email) VALUES (% s, % s, % s)", (username, generate_password_hash(password), email))
+        #     conn.commit()
+        #     msg = 'Signed up successfully !'
     return render_template('signup.html', title='Signup', msg=msg)
 
 @app.route('/forgotpassword', methods=['GET', 'POST'])
