@@ -1,69 +1,142 @@
-header nav ul li a:hover {
-    background-color: lightgray;
+html {
+    background-color: #F5F5DC;
 }
 
-header nav ul {
+.header>ul {
+    list-style-type: none;
+    margin: 0;
     padding: 0;
+    overflow: hidden;
+    background-color: #B94237
 }
 
-header nav ul li a {
-    padding: 1em 0 1em 0;
-    width: 100%;
-    display: inline-block;
+.header>li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: #111;
+}
+
+.conversion-controls {
+    margin-top: 250px;
+    padding-left: 250px;
+}
+
+h1, h2, p {
     text-align: center;
 }
 
-/* Login page */
-/* Responsive Media */
-img, audio, video {
-  display: block;
-  max-width: 100%;
-}
-/* ===== BASE STYLES ===== */
-.login {
-  text-align:center;
+h1, h2 {
+    margin-top: 100px;
 }
 
-.login fieldset {
-  display:inline;
-  width: 25%;
-  margin-left:auto;
-  margin-right:auto;
-  text-align:left;
-  border-radius: 0.4em;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,1), 0 6px 20px 0 rgba(0,0,0,1);
+.form-horizontal {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
 }
 
-img{
-  width: 100%;
-  position: absolute;
-  left: 0px;
-  top: 60px;
-  z-index: -1;
-  opacity: 0.4;
+.form-horizontal label {
+    margin: 5px 10px 5px 0;
 }
 
-.login h1 {
-  font-weight: bold;
-  text-align: center;
+.form-horizontal input {
+    vertical-align: middle;
+    margin: 5px 10px 5px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
 }
 
-.login p {
-  text-align: center;
-  width: 50%;
+.form-horizontal button {
+    padding: 10px 20px;
+    background-color: dodgerblue;
+    border: 1px solid #ddd;
+    color: white;
+    cursor: pointer;
 }
-/* Screen is greater than 425px. */
-@media (min-width: 425px) {
 
-    header nav ul {
-        display: table-row;
-        list-style-type: none;
+.form-horizontal button:hover {
+    background-color: royalblue;
+}
+
+/* Full-width input fields */
+
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    display: inline-block;
+    border: none;
+    background: #f1f1f1;
+}
+
+input[type=text]:focus, input[type=password]:focus {
+    background-color: #ddd;
+    outline: none;
+}
+
+hr {
+    border: 1px solid #f1f1f1;
+    margin-bottom: 25px;
+}
+
+/* Set a style for all buttons */
+
+button {
+    background-color: #04AA6D;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+}
+
+button:hover {
+    opacity: 1;
+}
+
+/* Extra styles for the cancel button */
+
+.cancelbtn {
+    padding: 14px 20px;
+    background-color: #f44336;
+}
+
+/* Float cancel and signup buttons and add an equal width */
+
+.cancelbtn, .signupbtn {
+    float: left;
+    width: 50%;
+}
+
+/* Add padding to container elements */
+
+.container {
+    padding: 16px;
+}
+
+/* Clear floats */
+
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+/* Change styles for cancel button and signup button on extra small screens */
+@media screen and (max-width: 300px) {
+    .cancelbtn, .signupbtn {
+      width: 100%;
     }
-
-    header nav ul li {
-        display: table-cell;
-        width: 1%;
-    }
-
-}
-
+  }

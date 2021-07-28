@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block header %}
+  <h1>{% block title %}Log In{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+  <form method="post" class="form-horizontal">
+    <label for="username">Username</label>
+    <input name="username" id="username" required><br><br><br><br>
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" required><br><br>
+    <input type="submit" value="Log In"><br><br><br><br><br><br>
+    <br><p class="bottom"><a href="{{ url_for('signup') }}" target="_blank">Sign up</a></p>
+    <p class="bottom"><a href="{{ url_for('forgotpassword') }}" target='_blank'>Forgot password?</a>
+  </form>
+{% endblock %}
