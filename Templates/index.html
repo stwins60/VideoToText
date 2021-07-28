@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8"/>
+    <title>Project Factor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,shrink-to-fit=no"/>
+    <link rel="shortcut icon" href="{{ url_for('static, filename='images/logo/logo.png')}}" type="image/x-icon"/>
+    <link rel="stylesheet" media="screen" href="{{ url_for('static', filename='style.css')}}">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+</head>
+
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a href="/index.html">Home</a></li>
+            <li><a href="/login.html">Login</a></li>
+            <li><a href="/aboutus.html">About us</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <section class="conversion-controls">
+        <input type="file" name="upload"/>
+        <button type="button" onclick="Preview();">Convert</button>
+        <button type="button" onclick="Preview();" disabled>Preview</button>
+        <button type="button" disabled>Download</button>
+    </section>
+
+    <section class="videos-grid"> <!-- I know using inline style is garbage. This is temporary. -->
+        <h1>Videos</h1>
+        <ul>
+            <li>
+                <article>
+                    <img src="/images/videos/cat-1.jpg" alt="Cat outdoors" style="max-width: 100px"/>
+                    <a href="/videos/cat-1.html"><p>Cat outdoors</p></a>
+                </article>
+            </li>
+            <li>
+                <article>
+                    <img src="/images/videos/cat-2.jpg" alt="The lives of savannah cats" style="max-width: 100px"/>
+                    <a href="/videos/cat-2.html"><p>The lives of savannah cats</p></a>
+                </article>
+            </li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>
