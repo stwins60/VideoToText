@@ -69,6 +69,15 @@ h1, h2 {
     background-color: royalblue;
 }
 
+.btn{
+    padding: 10px 40px;
+    background-color: #236B8E; 
+    color: #FFFFFF;
+    font-style: oblique;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
 /* Full-width input fields */
 
 .container input[type=text], .container input[type=password] {
