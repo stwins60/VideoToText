@@ -4,11 +4,12 @@
 <p>Text transcript only a few clicks away.</p>
 {% endblock %}
 {% block content %}
-<form method="post">
+<form method="post" action="{{ url_for('index')}}" enctype="multipart/form-data">
     <input type="file" name="upload"/>
-    <button type="button" onclick="Preview();">Convert</button>
+    <p><input type="submit" value="Upload & Convert"/></p>
+    <!-- <button type="button" onclick="Preview(); ">Convert</button>
     <button type="button" onclick="Preview();" disabled>Preview</button>
-    <button type="button" disabled>Download</button>
+    <button type="button" disabled>Download</button> -->
 </form>
 <section class="videos-grid"> <!-- I know using inline style is garbage. This is temporary. -->
     <h1>Videos</h1>
@@ -22,5 +23,6 @@
                 <img src="{{ url_for('static', filename='/images/videos/cat-2.jpg') }}" alt="The lives of savannah cats" style="max-width: 100px"/>
             </article>
         </p>
+    <p><a href="{{ url_for('logout') }}" class="btn">Logout</a></p>
 </section>
 {% endblock %}
