@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash, Blueprint
+from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory
 import sqlite3 as db
 # from werkzeug.security import check_password_hash, generate_password_hash
 import re, os
+import speech_recognition as sr
+import moviepy.editor as mp
 
 
 os.environ['FLASK_APP'] = 'app.py'
@@ -14,17 +16,44 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 
 app.secret_key = 'your secret key'
+app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
+app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
+
+@app.route('/')
 
 # bp = Blueprint('app', __name__, url_prefix='/app')
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    msg = ''
     if request.method == 'POST':
         file_upload = request.files['upload']
-        if file_upload.filename != '':
-            file_upload.save(os.path.join(current_dir, file_upload.filename))
-            return render_template('index.html', filename=file_upload.filename)
-        print(file_upload)
+        file_name = file_upload.filename
+        if file_name != '':
+            file_extension = os.path.splitext(file_name)[1]
+            if file_extension not in app.config['UPLOAD_EXTENSIONS']:
+                msg = 'File extension not allowed'
+            else:
+                file_upload.save(os.path.join(app.config['UPLOAD_PATH'], file_name))
+                msg = 'File uploaded successfully'
+                VIDEO_FILE = os.path.join(app.config['UPLOAD_PATH'], file_name)
+                OUTPUT_AUDIO_FILE = os.path.join(app.config['UPLOAD_PATH'], 'output.wav')
+                CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'], 'output.txt')
+                try:
+                    clip = mp.VideoFileClip(r"{}".format(VIDEO_FILE))
+                    clip.audio.write_audiofile(r"{}".format(OUTPUT_AUDIO_FILE))
+                    r = sr.Recognizer()
+                    audio_clip = sr.AudioFile(r"{}".format(OUTPUT_AUDIO_FILE))
+                    with audio_clip as source:
+                        audio = r.record(source)
+                    text = r.recognize_google(audio)
+                    with open(CONVERTED_TEXT_FILE, 'w') as f:
+                        f.write(text)
+                    msg = 'Speech to text conversion is done.'
+                except Exception as e:
+                    msg = 'Error in converting speech to text. {}'.format(e)
+            return render_template('index.html', filename=file_upload.filename, msg=msg)
+        # print(file_upload)
     return render_template('index.html')
 
 @classmethod
@@ -111,7 +140,9 @@ def logout():
     flash('You are logged out')
     return redirect(url_for('login'))
 
-
+@app.route('/uploads/<file_name>')
+def uploaded_file(file_name):
+    return send_from_directory(app.config['UPLOAD_PATH'], file_name)
 
 if __name__ == '__main__':
     app.run(debug=True)

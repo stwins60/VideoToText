@@ -1,0 +1,3 @@
+Flask == 2.0.1
+SpeechRecognition == 3.8.1
+moviepy == 1.0.3
