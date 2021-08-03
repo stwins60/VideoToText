@@ -4,6 +4,12 @@ import sqlite3 as db
 import re, os
 import speech_recognition as sr
 import moviepy.editor as mp
+from datetime import datetime
+
+date = str(datetime.date(datetime.now()))
+
+output_audio = date + "_output.wav"
+output_text = date + "_output.txt"
 
 
 os.environ['FLASK_APP'] = 'app.py'
@@ -36,9 +42,10 @@ def index():
             else:
                 file_upload.save(os.path.join(app.config['UPLOAD_PATH'], file_name))
                 msg = 'File uploaded successfully'
-                VIDEO_FILE = os.path.join(app.config['UPLOAD_PATH'], file_name)
-                OUTPUT_AUDIO_FILE = os.path.join(app.config['UPLOAD_PATH'], 'output.wav')
-                CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'], 'output.txt')
+                conv_file = date + file_name
+                VIDEO_FILE = os.path.join(app.config['UPLOAD_PATH'], conv_file)
+                OUTPUT_AUDIO_FILE = os.path.join(app.config['UPLOAD_PATH'], output_audio)
+                CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'], output_text)
                 try:
                     clip = mp.VideoFileClip(r"{}".format(VIDEO_FILE))
                     clip.audio.write_audiofile(r"{}".format(OUTPUT_AUDIO_FILE))
