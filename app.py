@@ -4,6 +4,8 @@ import sqlite3 as db
 import re, os
 import speech_recognition as sr
 import moviepy.editor as mp
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
 from datetime import datetime
 
 date = str(datetime.date(datetime.now()))
@@ -42,26 +44,71 @@ def index():
             else:
                 file_upload.save(os.path.join(app.config['UPLOAD_PATH'], file_name))
                 msg = 'File uploaded successfully'
-                conv_file = date + file_name
-                VIDEO_FILE = os.path.join(app.config['UPLOAD_PATH'], conv_file)
+                # conv_file = date + file_name
+                VIDEO_FILE = os.path.join(app.config['UPLOAD_PATH'], file_name)
                 OUTPUT_AUDIO_FILE = os.path.join(app.config['UPLOAD_PATH'], output_audio)
                 CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'], output_text)
                 try:
                     clip = mp.VideoFileClip(r"{}".format(VIDEO_FILE))
                     clip.audio.write_audiofile(r"{}".format(OUTPUT_AUDIO_FILE))
                     r = sr.Recognizer()
-                    audio_clip = sr.AudioFile(r"{}".format(OUTPUT_AUDIO_FILE))
-                    with audio_clip as source:
-                        audio = r.record(source)
-                    text = r.recognize_google(audio)
-                    with open(CONVERTED_TEXT_FILE, 'w') as f:
-                        f.write(text)
+                    # audio_clip = sr.AudioFile(r"{}".format(OUTPUT_AUDIO_FILE))
+                    get_large_audio_transcription(r"{}".format(OUTPUT_AUDIO_FILE))
                     msg = 'Speech to text conversion is done.'
                 except Exception as e:
                     msg = 'Error in converting speech to text. {}'.format(e)
             return render_template('index.html', filename=file_upload.filename, msg=msg)
         # print(file_upload)
     return render_template('index.html')
+
+def get_large_audio_transcription(path):
+    CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'], output_text)
+    r = sr.Recognizer()
+    """
+    Splitting the large audio file into chunks
+    and apply speech recognition on each of these chunks
+    """
+    # open the audio file using pydub
+    sound = AudioSegment.from_wav(path)
+    CONV_TEXT = open(CONVERTED_TEXT_FILE, 'w+')  
+    # split audio sound where silence is 700 miliseconds or more and get chunks
+    chunks = split_on_silence(sound,
+        # experiment with this value for your target audio file
+        min_silence_len = 500,
+        # adjust this per requirement
+        silence_thresh = sound.dBFS-14,
+        # keep the silence for 1 second, adjustable as well
+        keep_silence=500,
+    )
+    folder_name = "audio-chunks"
+    # create a directory to store the audio chunks
+    if os.path.exists(folder_name):
+        os.rmdir(folder_name)
+    if not os.path.isdir(folder_name):
+        os.mkdir(folder_name)
+    full_text = ""
+    # process each chunk 
+    for i, audio_chunk in enumerate(chunks, start=1):
+        # export audio chunk and save it in
+        # the `folder_name` directory.
+        chunk_filename = os.path.join(folder_name, f"chunk{i}.wav")
+        audio_chunk.export(chunk_filename, format="wav")
+        # recognize the chunk
+        with sr.AudioFile(chunk_filename) as source:
+            audio_listened = r.record(source)
+            # try converting it to text
+            try:
+                text = r.recognize_google(audio_listened)
+                # write the text to a file
+                CONV_TEXT.write(text + "\n")
+            except sr.UnknownValueError as e:
+                print("Error:", str(e))
+            else:
+                text = f"{text.capitalize()}. "
+                # print(chunk_filename, ":", text)
+                full_text += text
+    # return the text for all chunks detected
+    return full_text
 
 @classmethod
 def find_by_username(cls, username):
