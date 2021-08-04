@@ -7,6 +7,7 @@ import moviepy.editor as mp
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
 from datetime import datetime
+import shutil
 
 date = str(datetime.date(datetime.now()))
 
@@ -27,12 +28,16 @@ app.secret_key = 'your secret key'
 app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
 app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
 
-@app.route('/')
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
+
+# @app.route('/upload', methods=['POST'])
 
 # bp = Blueprint('app', __name__, url_prefix='/app')
 
-@app.route('/index', methods=['GET', 'POST'])
-def index():
+@app.route('/convert', methods=['GET', 'POST'])
+def convert():
     msg = ''
     if request.method == 'POST':
         file_upload = request.files['upload']
@@ -57,9 +62,9 @@ def index():
                     msg = 'Speech to text conversion is done.'
                 except Exception as e:
                     msg = 'Error in converting speech to text. {}'.format(e)
-            return render_template('index.html', filename=file_upload.filename, msg=msg)
+            return render_template('convert.html', filename=file_upload.filename, msg=msg)
         # print(file_upload)
-    return render_template('index.html')
+    return render_template('convert.html')
 
 def get_large_audio_transcription(path):
     CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'], output_text)
@@ -80,10 +85,13 @@ def get_large_audio_transcription(path):
         # keep the silence for 1 second, adjustable as well
         keep_silence=500,
     )
+    for file in os.listdir(current_dir):
+        if 'audio-chunks' in file:
+            shutil.rmtree(os.path.join(current_dir, file))
     folder_name = "audio-chunks"
     # create a directory to store the audio chunks
     if os.path.exists(folder_name):
-        os.rmdir(folder_name)
+        shutil.rmtree(folder_name)
     if not os.path.isdir(folder_name):
         os.mkdir(folder_name)
     full_text = ""
@@ -122,12 +130,13 @@ def find_by_username(cls, username):
     finally:
         conn.close()
 
-@app.route('/aboutus')
-def aboutus():
-    return render_template('aboutus.html', title='About us')
+@app.route('/')
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+    return render_template('index.html', title='Home')
     # return render_template('index.html')
 
-@app.route('/')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     alert = ''
@@ -149,7 +158,7 @@ def login():
             session['username'] = name
             alert = 'You are logged in'
             flash(alert)
-            return redirect(url_for('index'))
+            return redirect(url_for('convert'))
         else:
             alert = 'Wrong password'
     return render_template('login.html', title='Login', alert=alert)
@@ -184,6 +193,10 @@ def signup():
 @app.route('/forgotpassword', methods=['GET', 'POST'])
 def forgotpassword():
     return render_template('forgotpassword.html', title='Forgot Password')
+
+@app.route('/contactus', methods=['GET', 'POST'])
+def contactus():
+    return render_template('contactus.html', title='Contact Us')
 
 
 @app.route('/logout')

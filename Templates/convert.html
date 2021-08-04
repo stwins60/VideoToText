@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block header %}
+<h2>Video to Text Transcript Convertor!</h2>
+<p>Text transcript only a few clicks away.</p>
+{% endblock %}
+{% block content %}
+<form method="post" action="{{ url_for('convert')}}" enctype="multipart/form-data">
+    <input type="file" name="upload"/>
+    <p><input type="submit" value="Upload & Convert"/></p>
+    <!-- <button type="button" onclick="Preview(); ">Convert</button>
+    <button type="button" onclick="Preview();" disabled>Preview</button>
+    <button type="button" disabled>Download</button> -->
+</form>
+<h1>{{msg}}</h1>
+<section class="videos-grid"> <!-- I know using inline style is garbage. This is temporary. -->
+    <h1>Videos</h1>
+        <p>
+            <article>
+                <img src="{{ url_for('static', filename='/images/videos/cat-1.jpg') }}" alt="Cat outdoors" style="max-width: 100px"/>
+            </article>
+        </p>
+        <p>
+            <article>
+                <img src="{{ url_for('static', filename='/images/videos/cat-2.jpg') }}" alt="The lives of savannah cats" style="max-width: 100px"/>
+            </article>
+        </p>
+    <p><a href="{{ url_for('logout') }}" class="btn">Logout</a></p>
+</section>
+{% endblock %}
