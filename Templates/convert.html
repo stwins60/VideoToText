@@ -6,7 +6,8 @@
 {% block content %}
 <form method="post" action="{{ url_for('convert')}}" enctype="multipart/form-data">
     <input type="file" name="upload"/>
-    <p><input type="submit" value="Upload & Convert"/></p>
+    <p><input type="submit" value="Upload & Convert"/></p><br><br>
+    <p><a href="{{ url_for('download') }}">Download</a></p>
     <!-- <button type="button" onclick="Preview(); ">Convert</button>
     <button type="button" onclick="Preview();" disabled>Preview</button>
     <button type="button" disabled>Download</button> -->

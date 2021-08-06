@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory
+from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, send_file
 import sqlite3 as db
 # from werkzeug.security import check_password_hash, generate_password_hash
 import re, os
@@ -6,6 +6,7 @@ import speech_recognition as sr
 import moviepy.editor as mp
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
+from passlib.hash import sha256_crypt
 from datetime import datetime
 import shutil
 
@@ -28,13 +29,6 @@ app.secret_key = 'your secret key'
 app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
 app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
 
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-
-# @app.route('/upload', methods=['POST'])
-
-# bp = Blueprint('app', __name__, url_prefix='/app')
 
 @app.route('/convert', methods=['GET', 'POST'])
 def convert():
@@ -59,6 +53,24 @@ def convert():
                     r = sr.Recognizer()
                     # audio_clip = sr.AudioFile(r"{}".format(OUTPUT_AUDIO_FILE))
                     get_large_audio_transcription(r"{}".format(OUTPUT_AUDIO_FILE))
+                    conn = db.connect('database.db')
+                    title = file_name.split('.')[0]
+                    audio_title = title + '.wav'
+                    text_title = title + '.txt'
+                    video_file_size = os.path.getsize(r"{}".format(VIDEO_FILE))
+                    converted_text = open(CONVERTED_TEXT_FILE, 'r').read()
+                    upload_type = file_name.split('.')[1]
+                    
+                    with conn:
+                        cur = conn.cursor()
+                        audio_id = cur.execute("SELECT id FROM audio WHERE user_id = ?", (session['id'],)).fetchone()
+                        video_id = cur.execute("SELECT id FROM video WHERE user_id = ?", (session['id'],)).fetchone()
+                        texts_id = cur.execute("SELECT id FROM texts WHERE user_id = ?", (session['id'],)).fetchone()
+                        cur.execute("INSERT INTO video(title, user_id) VALUES(?,?)", (title, session['id']))
+                        cur.execute("INSERT INTO audio(title, user_id) VALUES(?,?)", (audio_title, session['id']))
+                        cur.execute("INSERT INTO text(title, user_id) VALUES(?,?)", (text_title, session['id']))
+                        cur.execute("INSERT INTO details(details, size, upload_type, audio_id, texts_id, video_id) VALUES(?,?,?,?,?)", (converted_text, video_file_size, upload_type, audio_id, texts_id, video_id))
+                        conn.commit()
                     msg = 'Speech to text conversion is done.'
                 except Exception as e:
                     msg = 'Error in converting speech to text. {}'.format(e)
@@ -118,6 +130,14 @@ def get_large_audio_transcription(path):
     # return the text for all chunks detected
     return full_text
 
+@app.route('/download', methods=['GET', 'POST'])
+def download():
+    
+    return send_file('static\\uploads\\'+output_text, mimetype='application/pdf', 
+    attachment_filename='output.docx', as_attachment=True)
+
+
+
 @classmethod
 def find_by_username(cls, username):
     conn = db.connect(current_dir +'\database.db')
@@ -144,15 +164,15 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # user = find_by_username(username)
-
         conn = db.connect(current_dir +'\database.db')
         cur = conn.cursor()
-        cur.execute(f'SELECT * FROM users WHERE username= ? AND password= ?', (username, password,))
+        # cur.execute(f'SELECT * FROM users WHERE username= ? AND password= ?', (username, password))
+        cur.execute('SELECT * FROM users')
         user = cur.fetchone()
         name = user[1]
         id = user[0]
-        if user:
+        
+        if sha256_crypt.verify(password, user[2]):
             session['loggedin'] = True
             session['id'] = id
             session['username'] = name
@@ -185,7 +205,7 @@ def signup():
         elif not username or not password or not email:
             msg = 'Please fill all the fields !'
         else:
-            cur.execute("INSERT INTO users (username, password, email) VALUES (?,?,?)", (username, password, email))
+            cur.execute("INSERT INTO users (username, password, email) VALUES (?,?,?)", (username, sha256_crypt.encrypt(password), email))
             conn.commit()
             msg = 'Signed up successfully !'
     return render_template('signup.html', title='Signup', msg=msg)
