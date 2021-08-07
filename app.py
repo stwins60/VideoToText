@@ -9,6 +9,7 @@ from pydub.silence import split_on_silence
 from passlib.hash import sha256_crypt
 from datetime import datetime
 import shutil
+import io
 
 date = str(datetime.date(datetime.now()))
 
@@ -53,7 +54,7 @@ def convert():
                     r = sr.Recognizer()
                     # audio_clip = sr.AudioFile(r"{}".format(OUTPUT_AUDIO_FILE))
                     get_large_audio_transcription(r"{}".format(OUTPUT_AUDIO_FILE))
-                    conn = db.connect('database.db')
+                    conn = db.connect('schema.db')
                     title = file_name.split('.')[0]
                     audio_title = title + '.wav'
                     text_title = title + '.txt'
@@ -68,8 +69,8 @@ def convert():
                         texts_id = cur.execute("SELECT id FROM texts WHERE user_id = ?", (session['id'],)).fetchone()
                         cur.execute("INSERT INTO video(title, user_id) VALUES(?,?)", (title, session['id']))
                         cur.execute("INSERT INTO audio(title, user_id) VALUES(?,?)", (audio_title, session['id']))
-                        cur.execute("INSERT INTO text(title, user_id) VALUES(?,?)", (text_title, session['id']))
-                        cur.execute("INSERT INTO details(details, size, upload_type, audio_id, texts_id, video_id) VALUES(?,?,?,?,?)", (converted_text, video_file_size, upload_type, audio_id, texts_id, video_id))
+                        cur.execute("INSERT INTO texts(title, user_id) VALUES(?,?)", (text_title, session['id']))
+                        cur.execute("INSERT INTO details(details, size, upload_type, user_id) VALUES(?,?,?,?)", (output_text, video_file_size, upload_type, session['id']))
                         conn.commit()
                     msg = 'Speech to text conversion is done.'
                 except Exception as e:
@@ -132,15 +133,32 @@ def get_large_audio_transcription(path):
 
 @app.route('/download', methods=['GET', 'POST'])
 def download():
-    
-    return send_file('static\\uploads\\'+output_text, mimetype='application/pdf', 
-    attachment_filename='output.docx', as_attachment=True)
+    conn = db.connect(current_dir + '/schema.db')
+    cur = conn.cursor()
+    cur.execute("SELECT details FROM details WHERE user_id = ?", (session['id'],))
+    data = cur.fetchone()
+    for i in data:
+        data_val = io.BytesIO(str(i))
+    print(data_val)
+    if data is None:
+        return render_template('convert.html')
+    else:
+        with open(data_val, 'r') as f:
+            text = f.read()
+            f.close()
+        with open('static\\converted_text\\output_text.txt', 'w') as f:
+            f.write(text)
+            f.close()
+        # return send_file(data, attachment_filename='details.txt', as_attachment=True)
+        return send_file(data_val, attachment_filename= 'ouptut.txt', mimetype= 'text/plain', as_attachment=True)
+    # return send_file('static\\uploads\\'+output_text, mimetype='application/pdf', 
+    # attachment_filename='output.docx', as_attachment=True)
 
 
 
 @classmethod
 def find_by_username(cls, username):
-    conn = db.connect(current_dir +'\database.db')
+    conn = db.connect(current_dir +'\schema.db')
     cur = conn.cursor()
         
     try:
@@ -164,7 +182,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        conn = db.connect(current_dir +'\database.db')
+        conn = db.connect(current_dir +'\schema.db')
         cur = conn.cursor()
         # cur.execute(f'SELECT * FROM users WHERE username= ? AND password= ?', (username, password))
         cur.execute('SELECT * FROM users')
@@ -191,7 +209,7 @@ def signup():
         password = request.form['password']
         email = request.form['email']
 
-        conn = db.connect(current_dir +'\database.db')
+        conn = db.connect(current_dir +'\schema.db')
         cur = conn.cursor()
         cur.execute('SELECT * FROM users WHERE username = ?', (username,))
         user = cur.fetchone()   
