@@ -12,4 +12,4 @@ This is a flask web application that converts users uploaded videos to text. The
 ![alt database](static/images/schema-diagram.PNG)
 
 ## Run
-- Run the applicate with `flask run` or `python app.py`
+- Run the application with `flask run` or `python app.py`
