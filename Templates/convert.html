@@ -1,19 +1,31 @@
 {% extends 'base.html' %}
+
 {% block header %}
-<h2>Video to Text Transcript Convertor!</h2>
-<p>Text transcript only a few clicks away.</p>
+<nav class = "topnav">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('convert') }}">Convert</a>
+    <a href="{{ url_for('contactus') }}">Contact us</a>
+</nav>
+<h2 style="text-align: center;">Video to Text Transcript Convertor!</h2>
+<p style="text-align: center;">Text transcript only a few clicks away.</p>
 {% endblock %}
 {% block content %}
-<form method="post" action="{{ url_for('convert')}}" enctype="multipart/form-data">
-    <input type="file" name="upload"/>
-    <p><input type="submit" value="Upload & Convert"/></p><br><br>
-    <p><a href="{{ url_for('download') }}">Download</a></p>
-    <!-- <button type="button" onclick="Preview(); ">Convert</button>
-    <button type="button" onclick="Preview();" disabled>Preview</button>
-    <button type="button" disabled>Download</button> -->
-</form>
-<h1>{{msg}}</h1>
-<section class="videos-grid"> <!-- I know using inline style is garbage. This is temporary. -->
+<section class="form">
+    <form method="post" action="{{ url_for('convert')}}" enctype="multipart/form-data">
+        <input type="file" name="upload"/>
+        <p><input type="submit" class="button" value="Upload & Convert"/></p>
+        <button type="button" class="button" onclick="window.location.href='{{ url_for('download') }}';">Download</button>
+        <!-- <button type="button" onclick="Preview(); ">Convert</button>
+        <button type="button" onclick="Preview();" disabled>Preview</button>
+        <button type="button" disabled>Download</button> -->
+    </form>
+</section>
+{% if msg == "Speech to text conversion is done." %}
+    <h1 style="text-align: center;">{{msg}}</h1>
+{% else %}
+    <h1 style="text-align: center;">No file found.</h1>
+{% endif %}
+<section class="form"> <!-- I know using inline style is garbage. This is temporary. -->
     <h1>Videos</h1>
         <p>
             <article>
@@ -25,6 +37,6 @@
                 <img src="{{ url_for('static', filename='/images/videos/cat-2.jpg') }}" alt="The lives of savannah cats" style="max-width: 100px"/>
             </article>
         </p>
-    <p><a href="{{ url_for('logout') }}" class="btn">Logout</a></p>
+    <button type="button" onclick="window.location.href='{{ url_for( 'logout') }}';" class="button">Logout</button>
 </section>
 {% endblock %}

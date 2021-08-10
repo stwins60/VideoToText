@@ -30,6 +30,14 @@ app.secret_key = 'your secret key'
 app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
 app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
 
+# cleaning upload folder
+upload_path = os.path.join(current_dir, 'static\\uploads')
+for files in os.listdir(upload_path):
+    path = os.path.join(upload_path, files)
+    try:
+        shutil.rmtree(path)
+    except OSError:
+        os.remove(path)
 
 @app.route('/convert', methods=['GET', 'POST'])
 def convert():
@@ -61,7 +69,8 @@ def convert():
                     video_file_size = os.path.getsize(r"{}".format(VIDEO_FILE))
                     converted_text = open(CONVERTED_TEXT_FILE, 'r').read()
                     upload_type = file_name.split('.')[1]
-                    
+                    # close recorgnizer
+                    clip.end()
                     with conn:
                         cur = conn.cursor()
                         audio_id = cur.execute("SELECT id FROM audio WHERE user_id = ?", (session['id'],)).fetchone()
@@ -133,26 +142,19 @@ def get_large_audio_transcription(path):
 
 @app.route('/download', methods=['GET', 'POST'])
 def download():
-    conn = db.connect(current_dir + '/schema.db')
-    cur = conn.cursor()
-    cur.execute("SELECT details FROM details WHERE user_id = ?", (session['id'],))
-    data = cur.fetchone()
-    for i in data:
-        data_val = io.BytesIO(str(i))
-    print(data_val)
-    if data is None:
-        return render_template('convert.html')
-    else:
-        with open(data_val, 'r') as f:
-            text = f.read()
-            f.close()
-        with open('static\\converted_text\\output_text.txt', 'w') as f:
-            f.write(text)
-            f.close()
-        # return send_file(data, attachment_filename='details.txt', as_attachment=True)
-        return send_file(data_val, attachment_filename= 'ouptut.txt', mimetype= 'text/plain', as_attachment=True)
-    # return send_file('static\\uploads\\'+output_text, mimetype='application/pdf', 
-    # attachment_filename='output.docx', as_attachment=True)
+    
+    # conn = db.connect(current_dir + '/schema.db')
+    # cur = conn.cursor()
+    # cur.execute("SELECT details FROM details WHERE user_id = ?", (session['id'],))
+    # data = cur.fetchone()
+    try:
+        msg = ''
+        return send_file('static\\uploads\\'+output_text, attachment_filename= 'ouptut.txt', mimetype= 'text/plain', as_attachment=True)
+    except:
+        msg = 'No file found.'
+        return render_template('convert.html', msg=msg)
+    
+        
 
 
 
@@ -242,6 +244,20 @@ def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
+    # cleaning upload folder
+    upload_path = os.path.join(current_dir, 'static\\uploads')
+    for files in os.listdir(upload_path):
+        path = os.path.join(upload_path, files)
+        try:
+            shutil.rmtree(path)
+        except OSError:
+            os.remove(path)
+    
+    folder_name = "audio-chunks"
+    # create a directory to store the audio chunks
+    if os.path.exists(folder_name):
+        shutil.rmtree(folder_name)
+    
     flash('You are logged out')
     return redirect(url_for('login'))
 

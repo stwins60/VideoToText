@@ -1,23 +1,18 @@
 {% extends 'base.html' %}
+
 {% block header %}
 <title>{{title}}</title>
+<nav class = "topnav">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('contactus') }}">Contact us</a>
+</nav>
 {% endblock %}
 {% block content %}
-<section class="Website Tutor">
-    <h3>Application Tutorial</h3>
-    <iframe src="https://www.youtube.com/embed/mIuVURa4ivI" frameborder="0" allow="accelerometer; autoplay;
-    encrypted-media; gyroscope; picture-in-picture"></iframe>
+<section class="home">
+    <h1 style="font-size:350%;">TEEM</h1>
+    <h2 style="font-size:300%;">Video to Text Transcript Convertor!</h2>
+    <p style="font-size:160%;">Text transcript a few click away.</p>
 </section>
-<section id="Website_details">
-    <h3>What can this website do?</h3>
-    <ol>
-        <li>A system allowing users to create accounts and upload video, using a speech to text
-            library (cloud based or open source) to create text transcripts of these videos
-        </li>
-        <ol>Video Storage</ol>
-        <li>Search engine to allow for searching of phrases and correlation with timestamp index
-            in the corresponding video
-        </li>
-    </ol>
 
 {% endblock %}

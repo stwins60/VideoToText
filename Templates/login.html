@@ -1,16 +1,25 @@
 {% extends 'base.html' %}
+
 {% block header %}
-  <h1>{% block title %}Log In{% endblock %}</h1>
+<nav class = "topnav">
+  <a href="{{ url_for('index') }}">Home</a>
+  <a href="{{ url_for('login') }}">Login</a>
+  <a href="{{ url_for('contactus') }}">Contact us</a>
+</nav>
+  <h1  style="text-align: center;">{% block title %}Log In{% endblock %}</h1>
 {% endblock %}
 {% block content %}
-  <form action="{{ url_for('login') }}" method="post" class="form-horizontal">
+  <!-- <div class="heading">
+    <h1  style="text-align: center;">Log In</h1>
+  </div> -->
+  <form action="{{ url_for('login') }}" method="post" class="log_form">
     <label for="username">Username</label>
-    <input name="username" id="username" required></br/></br/><br><br/><br/><br/><br/><br/>
+    <input name="username" id="username" required>
     <label for="password">Password</label>
-    <input type="password" name="password" id="password" required><br/><br/>
-    <input type="submit" value="Log In"><br/><br/><br/><br/><br/><br/>
-    <br><p class="bottom"><a href="{{ url_for('signup') }}">Sign up</a></p><br/><br/><br/><br/><br/><br/><br/><br/>
-    <p class="bottom"><a href="{{ url_for('forgotpassword') }}">Forgot password?</a></p>
+    <input type="password" name="password" id="password" required>
+    <input type="submit" class="btn" value="Log In">
+    <br><p class="btn"><a href="{{ url_for('signup') }}">Sign up</a></p>
+    <p class="btn"><a href="{{ url_for('forgotpassword') }}">Forgot password?</a></p>
   </form>
   {{alert}}
 {% endblock %}
