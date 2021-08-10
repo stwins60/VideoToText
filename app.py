@@ -30,6 +30,15 @@ app.secret_key = 'your secret key'
 app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
 app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
 
+
+# creating an upload folder
+upload_folder = os.path.join(current_dir, 'static\\uploads')
+
+if os.exists(upload_folder):
+    shutil.rmtree(upload_folder)
+if not os.path.isdir(upload_folder):
+    os.mkdir(upload_folder)
+
 # cleaning upload folder
 upload_path = os.path.join(current_dir, 'static\\uploads')
 for files in os.listdir(upload_path):
@@ -148,8 +157,8 @@ def download():
     # cur.execute("SELECT details FROM details WHERE user_id = ?", (session['id'],))
     # data = cur.fetchone()
     try:
-        msg = ''
-        return send_file('static\\uploads\\'+output_text, attachment_filename= 'ouptut.txt', mimetype= 'text/plain', as_attachment=True)
+        msg = 'File downloaded successfully'
+        return send_file('static\\uploads\\'+output_text, attachment_filename= 'ouptut.txt', mimetype= 'text/plain', as_attachment=True, msg=msg)
     except:
         msg = 'No file found.'
         return render_template('convert.html', msg=msg)

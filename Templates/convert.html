@@ -22,11 +22,13 @@
 </section>
 {% if msg == "Speech to text conversion is done." %}
     <h1 style="text-align: center;">{{msg}}</h1>
+{% elif msg == "File downloaded successfully" %}
+    <h1 style="text-align: center;">{{msg}}</h1>
 {% else %}
     <h1 style="text-align: center;">No file found.</h1>
 {% endif %}
 <section class="form"> <!-- I know using inline style is garbage. This is temporary. -->
-    <h1>Videos</h1>
+    <h1 style="text-align: center;">Videos</h1>
         <p>
             <article>
                 <img src="{{ url_for('static', filename='/images/videos/cat-1.jpg') }}" alt="Cat outdoors" style="max-width: 100px"/>
