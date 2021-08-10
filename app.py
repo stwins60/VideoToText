@@ -34,7 +34,7 @@ app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
 # creating an upload folder
 upload_folder = os.path.join(current_dir, 'static\\uploads')
 
-if os.exists(upload_folder):
+if os.path.exists(upload_folder):
     shutil.rmtree(upload_folder)
 if not os.path.isdir(upload_folder):
     os.mkdir(upload_folder)
