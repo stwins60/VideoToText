@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<title>{{title}}</title>
+<nav class = "topnav">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('contactus') }}">Contact us</a>
+</nav>
+{% endblock %}
+{% block content %}
+<body>
+    <h3 style="text-align: right;">Welcome, {{user}}</h3>
+    <button type="button" onclick="window.location.href='{{ url_for( 'logout') }}';" class="button">Logout</button>
+    <section class="home">
+        <h1 style="text-align: center;">Welcome to the Admin Panel</h1>
+        <h3>Registered user</h3>
+        <table class="tg">
+            <tr>
+                <th width="80">User ID</th>
+                <th width="120">Username</th>
+                <th width="120">First Name</th>
+                <th width="120">Last Name</th>
+                <th width="120">Email Address</th>
+                <th width="120">Country</th>
+                <th width="120">Password</th>
+            </tr>
+            {% for row in rows %}
+                <tr>
+                    <td>{{ row.id }}</td>
+                    <td>{{ row.username }}</td>
+                    <td>{{ row.firstname }}</td>
+                    <td>{{ row.lastname }}</td>
+                    <td>{{ row.password }}</td>
+                    <td>{{ row.email }}</td>
+                    <td>{{ row.country }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+</body>
+
+{% endblock %}
