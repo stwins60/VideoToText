@@ -9,10 +9,7 @@
   <h1  style="text-align: center;">{% block title %}Log In{% endblock %}</h1>
 {% endblock %}
 {% block content %}
-  <!-- <div class="heading">
-    <h1  style="text-align: center;">Log In</h1>
-  </div> -->
-  <h3 style="text-align: right;">Welcome, {{user}}</h3>
+
   <form action="{{ url_for('login') }}" method="post" class="log_form">
     <label for="username">Username</label>
     <input name="username" id="username" required>
@@ -20,7 +17,6 @@
     <input type="password" name="password" id="password" required>
     <input type="submit" class="btn" value="Log In">
     <br><p class="btn"><a href="{{ url_for('signup') }}">Sign up</a></p>
-    <p class="btn"><a href="{{ url_for('forgotpassword') }}">Forgot password?</a></p>
   </form>
   {{alert}}
 {% endblock %}

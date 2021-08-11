@@ -9,7 +9,6 @@
 </nav>
 {% endblock %}
 {% block content %}
-<body>
     <h3 style="text-align: right;">Welcome, {{user}}</h3>
     <button type="button" onclick="window.location.href='{{ url_for( 'logout') }}';" class="button">Logout</button>
     <section class="home">
@@ -21,23 +20,23 @@
                 <th width="120">Username</th>
                 <th width="120">First Name</th>
                 <th width="120">Last Name</th>
+                <th width="120">Password</th>
                 <th width="120">Email Address</th>
                 <th width="120">Country</th>
-                <th width="120">Password</th>
+                
             </tr>
-            {% for row in rows %}
+            {% for row in users %}
                 <tr>
-                    <td>{{ row.id }}</td>
-                    <td>{{ row.username }}</td>
-                    <td>{{ row.firstname }}</td>
-                    <td>{{ row.lastname }}</td>
-                    <td>{{ row.password }}</td>
-                    <td>{{ row.email }}</td>
-                    <td>{{ row.country }}</td>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                    <td>{{ row[2] }}</td>
+                    <td>{{ row[3] }}</td>
+                    <td>{{ row[4] }}</td>
+                    <td>{{ row[5] }}</td>
+                    <td>{{ row[6] }}</td>
                 </tr>
             {% endfor %}
         </table>
     </section>
-</body>
 
 {% endblock %}

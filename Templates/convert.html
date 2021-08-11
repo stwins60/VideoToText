@@ -6,6 +6,7 @@
     <a href="{{ url_for('convert') }}">Convert</a>
     <a href="{{ url_for('contactus') }}">Contact us</a>
 </nav>
+<h3 style="text-align: right;">Welcome, {{user}}</h3>
 <h2 style="text-align: center;">Video to Text Transcript Convertor!</h2>
 <p style="text-align: center;">Text transcript only a few clicks away.</p>
 {% endblock %}
@@ -20,13 +21,7 @@
         <button type="button" disabled>Download</button> -->
     </form>
 </section>
-{% if msg == "Speech to text conversion is done." %}
     <h1 style="text-align: center;">{{msg}}</h1>
-{% elif msg == "File downloaded successfully" %}
-    <h1 style="text-align: center;">{{msg}}</h1>
-{% else %}
-    <h1 style="text-align: center;">No file found.</h1>
-{% endif %}
 <section class="form"> <!-- I know using inline style is garbage. This is temporary. -->
     <h1 style="text-align: center;">Videos</h1>
         <p>

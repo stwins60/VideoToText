@@ -79,8 +79,7 @@ def convert():
                     video_file_size = os.path.getsize(r"{}".format(VIDEO_FILE))
                     converted_text = open(CONVERTED_TEXT_FILE, 'r').read()
                     upload_type = file_name.split('.')[1]
-                    # close recorgnizer
-                    clip.end()
+                    
                     with conn:
                         cur = conn.cursor()
                         cur.execute(
@@ -97,14 +96,16 @@ def convert():
                             (output_text, video_file_size, upload_type,
                              session['id']))
                         conn.commit()
+                        logged_in_user = cur.execute('SELECT * FROM users WHERE id = ?', (session['id'],)).fetchone()
+                        
+                        print(logged_in_user)
+                        
                     msg = 'Speech to text conversion is done.'
+
                 except Exception as e:
                     msg = 'Error in converting speech to text. {}'.format(e)
-            return render_template('convert.html',
-                                   filename=file_upload.filename,
-                                   msg=msg)
-        # print(file_upload)
-    return render_template('convert.html')
+    return render_template('convert.html', msg=msg, user = session['username'])
+            
 
 
 def get_large_audio_transcription(path):
@@ -163,23 +164,25 @@ def get_large_audio_transcription(path):
 
 @app.route('/download', methods=['GET', 'POST'])
 def download():
-
-    try:
-        msg = 'File downloaded successfully'
-        return send_file('static\\uploads\\' + output_text,
+    return send_file('static\\uploads\\' + output_text,
                          attachment_filename='ouptut.txt',
                          mimetype='text/plain',
-                         as_attachment=True,
-                         msg=msg)
-    except:
-        msg = 'No file found.'
-        return render_template('convert.html', msg=msg)
+                         as_attachment=True)
 
 
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     return render_template('index.html', title='Home')
+
+
+@app.route('/auth/admin', methods=['GET', 'POST'])
+def admin():
+    conn = db.connect(current_dir + '\schema.db')
+    cur = conn.cursor()
+    cur.execute('SELECT * FROM users')
+    users = cur.fetchall()
+    return render_template('/auth/admin.html', user = session['username'], users=users)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -196,31 +199,32 @@ def login():
         name = user[1]
         id = user[0]
 
-        if sha256_crypt.verify(password, user[2]):
-            session['loggedin'] = True
-            session['id'] = id
-            session['username'] = name
-            alert = 'You are logged in'
-            flash(alert)
-            return redirect(url_for('convert'))
-        elif name == 'admin' or name == 'Admin':
-            session['loggedin'] = True
-            session['id'] = id
-            session['username'] = name
-            alert = 'You are logged in'
-            flash(alert)
+        if username == 'admin' and password == 'admin':
+            session['username'] = 'admin'
+            session['id'] = 94
+            session['logged_in'] = True
 
-            rows = cur.execute('SELECT * FROM users').fetchall()
+            return redirect(url_for('admin'))
+       
+        
+        elif sha256_crypt.verify(password, user[4]):
+            if username == name:
+                session['logged_in'] = True
+                session['id'] = id
+                session['username'] = username
+                
+                return redirect(url_for('convert'))
+            elif username == 'admin' and password == sha256_crypt.verify(password, user[4]):
+                session['loggedin'] = True
+                session['id'] = id
+                session['username'] = username
+                msg = 'You are logged in'
 
-            return redirect(url_for('/Auth/admin'),
-                            alert=alert,
-                            user=session['username'], rows=rows)
-        else:
+                print(session['username'])
+                flash(alert)
+
             alert = 'Wrong password'
-    return render_template('login.html',
-                           title='Login',
-                           alert=alert,
-                           user=session['username'])
+    return render_template('login.html', alert=alert)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -228,8 +232,8 @@ def signup():
     msg = ''
     if request.method == 'POST':
         username = request.form['username']
-        firstname = request.form['firstname']
-        lastname = request.form['lastname']
+        firstname = request.form['fname']
+        lastname = request.form['lname']
         email = request.form['email']
         password = request.form['password']
         country = request.form['country']
@@ -268,14 +272,14 @@ def logout():
     session.pop('loggedin', None)
     session.pop('id', None)
     session.pop('username', None)
-    # cleaning upload folder
-    upload_path = os.path.join(current_dir, 'static\\uploads')
-    for files in os.listdir(upload_path):
-        path = os.path.join(upload_path, files)
-        try:
-            shutil.rmtree(path)
-        except OSError:
-            os.remove(path)
+    # # cleaning upload folder
+    # upload_path = os.path.join(current_dir, 'static\\uploads')
+    # for files in os.listdir(upload_path):
+    #     path = os.path.join(upload_path, files)
+    #     try:
+    #         shutil.rmtree(path)
+    #     except OSError:
+    #         os.remove(path)
 
     folder_name = "audio-chunks"
     # create a directory to store the audio chunks
