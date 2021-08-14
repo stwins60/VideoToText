@@ -15,7 +15,7 @@
           <p style="text-align: center;">Please fill in this form to create an account.</p>
         </div>
           <hr>
-
+          <h2 style="text-align: center;">{{msg}}</h2>
           <label for="firstname"><b>First Name</b></label>
           <input type="text" class ='form_input' placeholder="Enter First Name" name="fname" required>
           
@@ -32,7 +32,7 @@
           <input type="password" class ='form_input' placeholder="Enter Password" name="password" required>
           
           <label for="country"><b>Country</b></label>
-          <input type="text" class ='form_input' placeholder="Enter your Country" name="country" required>
+          <input type="text" class ='form_input' placeholder="Enter your Country" name="country" required><br>
 
           <button type="button" <a href="{{ url_for('login') }}" class="button">Cancel</a></button>
           <button type="submit" class="button">Sign Up</button>

@@ -10,6 +10,9 @@ from passlib.hash import sha256_crypt
 from datetime import datetime
 import shutil
 import io
+from flask_cors import CORS
+
+
 
 date = str(datetime.date(datetime.now()))
 
@@ -22,6 +25,8 @@ os.environ['FLASK_ENV'] = 'development'
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__)
+
+CORS(app)
 
 app.secret_key = 'your secret key'
 app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
@@ -188,42 +193,36 @@ def admin():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     alert = ''
+    NoneType = type(None)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
         password = request.form['password']
 
         conn = db.connect(current_dir + '\schema.db')
         cur = conn.cursor()
-        cur.execute('SELECT * FROM users')
+        cur.execute('SELECT * FROM users WHERE username = ?', (username,))
         user = cur.fetchone()
         name = user[1]
         id = user[0]
 
-        if username == 'admin' and password == 'admin':
-            session['username'] = 'admin'
-            session['id'] = 94
+        if user is None:
+            alert = 'Invalid username'
+        
+        elif username == name and sha256_crypt.verify(password, user[4]):
+            session['logged_in'] = True
+            session['username'] = name
+            session['id'] = id
+            return redirect(url_for('convert'))
+
+        elif name == 'admin' and password == 'admin':
+            session['username'] = name
+            session['id'] = id
             session['logged_in'] = True
 
             return redirect(url_for('admin'))
-       
-        
-        elif sha256_crypt.verify(password, user[4]):
-            if username == name:
-                session['logged_in'] = True
-                session['id'] = id
-                session['username'] = username
-                
-                return redirect(url_for('convert'))
-            elif username == 'admin' and password == sha256_crypt.verify(password, user[4]):
-                session['loggedin'] = True
-                session['id'] = id
-                session['username'] = username
-                msg = 'You are logged in'
+        else:
+            alert = 'Invalid Credentials. Please try again.'
 
-                print(session['username'])
-                flash(alert)
-
-            alert = 'Wrong password'
     return render_template('login.html', alert=alert)
 
 
