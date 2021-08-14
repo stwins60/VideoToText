@@ -183,7 +183,7 @@ def index():
 
 @app.route('/auth/admin', methods=['GET', 'POST'])
 def admin():
-    conn = db.connect(current_dir + '\schema.db')
+    conn = db.connect('schema.db')
     cur = conn.cursor()
     cur.execute('SELECT * FROM users')
     users = cur.fetchall()
@@ -198,7 +198,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        conn = db.connect(current_dir + '\schema.db')
+        conn = db.connect('schema.db')
         cur = conn.cursor()
         cur.execute('SELECT * FROM users WHERE username = ?', (username,))
         user = cur.fetchone()
@@ -238,7 +238,7 @@ def signup():
         country = request.form['country']
         
 
-        conn = db.connect(current_dir + '\schema.db')
+        conn = db.connect('schema.db')
         cur = conn.cursor()
         cur.execute('SELECT * FROM users WHERE username = ?', (username, ))
         user = cur.fetchone()
@@ -306,7 +306,7 @@ def sendMessage():
         if not firstname or not lastname or not email or not message:
             msg = 'Please fill all the fields !'
         else:
-            conn = db.connect(current_dir + '\schema.db')
+            conn = db.connect('schema.db')
             cur = conn.cursor()
             cur.execute(
                 'INSERT INTO enquiry (firstname, lastname, email, message) VALUES (?,?,?,?)',
