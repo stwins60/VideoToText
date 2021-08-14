@@ -91,8 +91,6 @@ def convert():
                 upload_file_to_s3(OUTPUT_AUDIO_FILE)
                 upload_file_to_s3(CONVERTED_TEXT_FILE)
 
-                video_file = download_file_from_s3(app.config['S3_BUCKET'], VIDEO_FILE)
-                print(video_file)
 
                 try:
                     video_file = download_file_from_s3(app.config['S3_BUCKET'], VIDEO_FILE)
