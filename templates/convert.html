@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<nav class = "topnav">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('convert') }}">Convert</a>
+    <a href="{{ url_for('contactus') }}">Contact us</a>
+</nav>
+<h3 style="text-align: right;">Welcome, {{user}}</h3>
+<h2 style="text-align: center;">Video to Text Transcript Convertor!</h2>
+<p style="text-align: center;">Text transcript only a few clicks away.</p>
+{% endblock %}
+{% block content %}
+<section class="form">
+    <form method="post" action="{{ url_for('convert')}}" enctype="multipart/form-data">
+        <input type="file" name="upload"/>
+        <p><input type="submit" class="button" value="Upload & Convert"/></p>
+        <button type="button" class="button" onclick="window.location.href='{{ url_for('download') }}';">Download</button>
+        <!-- <button type="button" onclick="Preview(); ">Convert</button>
+        <button type="button" onclick="Preview();" disabled>Preview</button>
+        <button type="button" disabled>Download</button> -->
+    </form>
+</section>
+    <h1 style="text-align: center;">{{msg}}</h1>
+<section class="form"> <!-- I know using inline style is garbage. This is temporary. -->
+    <h1 style="text-align: center;">Videos</h1>
+        <p>
+            <article>
+                <img src="{{ url_for('static', filename='/images/videos/cat-1.jpg') }}" alt="Cat outdoors" style="max-width: 100px"/>
+            </article>
+        </p>
+        <p>
+            <article>
+                <img src="{{ url_for('static', filename='/images/videos/cat-2.jpg') }}" alt="The lives of savannah cats" style="max-width: 100px"/>
+            </article>
+        </p>
+    <button type="button" onclick="window.location.href='{{ url_for( 'logout') }}';" class="button">Logout</button>
+</section>
+{% endblock %}

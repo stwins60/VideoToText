@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<title>{{title}}</title>
+<nav class = "topnav">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('signup') }}">Register</a>
+    <a href="{{ url_for('contactus') }}">Contact us</a>
+</nav>
+{% endblock %}
+{% block content %}
+
+<section class="home">
+    <h1 style="font-size:350%;">TEEM</h1>
+    <h2 style="font-size:300%;">Video to Text Transcript Convertor!</h2>
+    <p style="font-size:160%;">Text transcript a few click away.</p>
+</section>
+
+{% endblock %}
