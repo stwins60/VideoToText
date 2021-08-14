@@ -30,10 +30,10 @@ CORS(app)
 
 app.secret_key = 'your secret key'
 app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
-app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
+app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static/uploads')
 
 # creating an upload folder
-upload_folder = os.path.join(current_dir, 'static\\uploads')
+upload_folder = os.path.join(current_dir, 'static/uploads')
 
 if os.path.exists(upload_folder):
     shutil.rmtree(upload_folder)
@@ -41,7 +41,7 @@ if not os.path.isdir(upload_folder):
     os.mkdir(upload_folder)
 
 # cleaning upload folder
-upload_path = os.path.join(current_dir, 'static\\uploads')
+upload_path = os.path.join(current_dir, 'static/uploads')
 for files in os.listdir(upload_path):
     path = os.path.join(upload_path, files)
     try:
@@ -169,7 +169,7 @@ def get_large_audio_transcription(path):
 
 @app.route('/download', methods=['GET', 'POST'])
 def download():
-    return send_file('static\\uploads\\' + output_text,
+    return send_file('static/uploads/' + output_text,
                          attachment_filename='ouptut.txt',
                          mimetype='text/plain',
                          as_attachment=True)
