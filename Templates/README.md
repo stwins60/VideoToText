@@ -1,0 +1,1 @@
+## Templates for all html files
