@@ -83,18 +83,18 @@ def convert():
                 CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'],
                                                    output_text)
 
-                print(OUTPUT_AUDIO_FILE)
-                # store the file in s3
-                upload_file_to_s3(VIDEO_FILE)
-                upload_file_to_s3(OUTPUT_AUDIO_FILE)
-                upload_file_to_s3(CONVERTED_TEXT_FILE)
+                # print(OUTPUT_AUDIO_FILE)
+                # # store the file in s3
+                # upload_file_to_s3(VIDEO_FILE)
+                # upload_file_to_s3(OUTPUT_AUDIO_FILE)
+                # upload_file_to_s3(CONVERTED_TEXT_FILE)
 
 
                 try:
-                    video_file = download_file_from_s3(app.config['S3_BUCKET'], VIDEO_FILE)
-                    print(video_file)
+                    # video_file = download_file_from_s3(app.config['S3_BUCKET'], VIDEO_FILE)
+                    # print(video_file)
     
-                    clip = mp.VideoFileClip(r"{}".format(video_file))
+                    clip = mp.VideoFileClip(r"{}".format(VIDEO_FILE))
                     clip.audio.write_audiofile(r"{}".format(OUTPUT_AUDIO_FILE))
                     r = sr.Recognizer()
                     # audio_clip = sr.AudioFile(r"{}".format(OUTPUT_AUDIO_FILE))
@@ -192,12 +192,12 @@ def get_large_audio_transcription(path):
 
 @app.route('/download', methods=['GET', 'POST'])
 def download():
-    save_file = download_file_from_s3(app.config['S3_BUCKET'], output_text)
-    return send_file(save_file, attachment_filename='output_text.txt', mimetype='text/plain', as_attachment=True)
-    # return send_file('static/uploads/' + output_text,
-    #                      attachment_filename='ouptut.txt',
-    #                      mimetype='text/plain',
-    #                      as_attachment=True)
+    # save_file = download_file_from_s3(app.config['S3_BUCKET'], output_text)
+    # return send_file(save_file, attachment_filename='output_text.txt', mimetype='text/plain', as_attachment=True)
+    return send_file('static//uploads//' + output_text,
+                         attachment_filename='ouptut.txt',
+                         mimetype='text/plain',
+                         as_attachment=True)
 
 
 @app.route('/')
@@ -343,21 +343,21 @@ def sendMessage():
 
 
 # create a function to upload the file to s3
-def upload_file_to_s3(file_name):
-    conn = boto.connect_s3(app.config['S3_KEY'], app.config['S3_SECRET'])
-    bucket = conn.get_bucket(app.config['S3_BUCKET'])
-    k = boto.s3.key.Key(bucket)
-    k.key = file_name
-    k.set_contents_from_filename(os.path.join(app.config['UPLOAD_PATH'], file_name))
-    k.make_public()
+# def upload_file_to_s3(file_name):
+#     conn = boto.connect_s3(app.config['S3_KEY'], app.config['S3_SECRET'])
+#     bucket = conn.get_bucket(app.config['S3_BUCKET'])
+#     k = boto.s3.key.Key(bucket)
+#     k.key = file_name
+#     k.set_contents_from_filename(os.path.join(app.config['UPLOAD_PATH'], file_name))
+#     k.make_public()
 
-# create function that downloads the file from s3
-def download_file_from_s3(bucket_name, file_name):
-    conn = boto.connect_s3(app.config['S3_KEY'], app.config['S3_SECRET'])
-    bucket = conn.get_bucket(bucket_name)
-    k = boto.s3.key.Key(bucket)
-    k.key = file_name
-    k.get_contents_to_filename(file_name)
+# # create function that downloads the file from s3
+# def download_file_from_s3(bucket_name, file_name):
+#     conn = boto.connect_s3(app.config['S3_KEY'], app.config['S3_SECRET'])
+#     bucket = conn.get_bucket(bucket_name)
+#     k = boto.s3.key.Key(bucket)
+#     k.key = file_name
+#     k.get_contents_to_filename(file_name)
 
 if __name__ == '__main__':
     app.run(debug=True)
