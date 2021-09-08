@@ -1,1 +1,1 @@
-web: gunicorn app:app --timeout 3600
+web: waitress-serve --port=$PORT VideoToText.wsgi:application
