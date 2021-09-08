@@ -16,8 +16,6 @@ import boto.s3
 import boto.s3.connection
 import boto.s3.key
 
-import auth
-
 
 date = str(datetime.date(datetime.now()))
 
