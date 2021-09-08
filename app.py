@@ -11,10 +11,7 @@ from datetime import datetime
 import shutil
 import io
 from flask_cors import CORS
-import boto
-import boto.s3
-import boto.s3.connection
-import boto.s3.key
+
 
 
 date = str(datetime.date(datetime.now()))
@@ -32,15 +29,15 @@ app = Flask(__name__)
 CORS(app)
 
 app.secret_key = 'your secret key'
-app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
+app.config['UPLOAD_EXTENSIONS'] = set(['.mp3', '.mp4', '.wav'])
 app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
 
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 # app.config['ALLOWED_EXTENSIONS'] = set(['mp4', 'mp3'])
-app.config['S3_BUCKET'] = 'flask-app-05'
-app.config['S3_KEY'] = auth.S3_KEY
-app.config['S3_SECRET'] = auth.S3_SECRET
-app.config['S3_LOCATION'] = 'http://flask-app-05.s3.amazonaws.com/'
+# app.config['S3_BUCKET'] = 'flask-app-05'
+# app.config['S3_KEY'] = auth.S3_KEY
+# app.config['S3_SECRET'] = auth.S3_SECRET
+# app.config['S3_LOCATION'] = 'http://flask-app-05.s3.amazonaws.com/'
 
 
 
