@@ -1,6 +1,6 @@
 .env
 venv/
 auth.py
-.vscode/
+.vscode
 env
 __pycache__
