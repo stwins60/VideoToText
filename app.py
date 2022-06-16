@@ -1,7 +1,7 @@
 from sqlite3.dbapi2 import Connection
 from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, send_file
 import sqlite3 as db
-# from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 import re, os
 import speech_recognition as sr
 import moviepy.editor as mp
@@ -84,7 +84,7 @@ def convert():
                 file_upload.save(
                     os.path.join(app.config['UPLOAD_PATH'], file_name))
                 msg = 'File uploaded successfully'
-                # conv_file = date + file_name
+                conv_file = date + file_name
                 VIDEO_FILE = os.path.join(app.config['UPLOAD_PATH'], file_name)
                 OUTPUT_AUDIO_FILE = os.path.join(app.config['UPLOAD_PATH'],
                                                  output_audio)
@@ -104,6 +104,9 @@ def convert():
                 print(download_file)
 
                 try:
+                    # video_file = download_file_from_s3(app.config['S3_BUCKET'], VIDEO_FILE)
+                    # print(video_file)
+    
                     clip = mp.VideoFileClip(r"{}".format(VIDEO_FILE))
                     clip.audio.write_audiofile(r"{}".format(OUTPUT_AUDIO_FILE))
                     r = sr.Recognizer()
@@ -147,7 +150,7 @@ def convert():
 
 
 def get_large_audio_transcription(path):
-    CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'], output_text)
+    CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_FOLDER'], output_text)
     r = sr.Recognizer()
     """
     Splitting the large audio file into chunks
@@ -370,6 +373,23 @@ for files in os.listdir(upload_path):
         shutil.rmtree(path)
     except OSError:
         os.remove(path)
+
+# create a function to upload the file to s3
+# def upload_file_to_s3(file_name):
+#     conn = boto.connect_s3(app.config['S3_KEY'], app.config['S3_SECRET'])
+#     bucket = conn.get_bucket(app.config['S3_BUCKET'])
+#     k = boto.s3.key.Key(bucket)
+#     k.key = file_name
+#     k.set_contents_from_filename(os.path.join(app.config['UPLOAD_PATH'], file_name))
+#     k.make_public()
+
+# # create function that downloads the file from s3
+# def download_file_from_s3(bucket_name, file_name):
+#     conn = boto.connect_s3(app.config['S3_KEY'], app.config['S3_SECRET'])
+#     bucket = conn.get_bucket(bucket_name)
+#     k = boto.s3.key.Key(bucket)
+#     k.key = file_name
+#     k.get_contents_to_filename(file_name)
 
 if __name__ == '__main__':
     app.run(debug=True)
