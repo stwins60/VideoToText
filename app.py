@@ -1,3 +1,4 @@
+from sqlite3.dbapi2 import Connection
 from flask import Flask, render_template, request, session, redirect, url_for, flash, send_from_directory, send_file
 import sqlite3 as db
 # from werkzeug.security import check_password_hash, generate_password_hash
@@ -12,6 +13,10 @@ import shutil
 import io
 from flask_cors import CORS
 
+import boto3
+import boto.s3.connection
+import boto.s3.key
+import auth
 
 
 date = str(datetime.date(datetime.now()))
@@ -30,24 +35,39 @@ CORS(app)
 
 app.secret_key = 'your secret key'
 app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
-app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static/uploads')
+app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
+
+app.config['S3_ACCESS_KEY'] = auth.S3_ACCESS_KEY
+app.config['S3_SECRET_KEY'] = auth.S3_SECRET_KEY
+app.config['S3_BUCKET'] = auth.S3_BUCKET
 
 # creating an upload folder
-upload_folder = os.path.join(current_dir, 'static/uploads')
+upload_folder = os.path.join(current_dir, 'static\\uploads')
 
 if os.path.exists(upload_folder):
     shutil.rmtree(upload_folder)
 if not os.path.isdir(upload_folder):
     os.mkdir(upload_folder)
 
-# cleaning upload folder
-upload_path = os.path.join(current_dir, 'static/uploads')
-for files in os.listdir(upload_path):
-    path = os.path.join(upload_path, files)
-    try:
-        shutil.rmtree(path)
-    except OSError:
-        os.remove(path)
+
+# create a function to upload a file to s3
+def upload_file_to_s3(file_name):
+    conn = boto.connect_s3(app.config['S3_ACCESS_KEY'], app.config['S3_SECRET_KEY'])
+    bucket = conn.get_bucket(app.config['S3_BUCKET'])
+    k = boto.s3.key.Key(bucket)
+    k.key = file_name
+    k.set_contents_from_filename(os.path.join(app.config['UPLOAD_PATH'], file_name))
+    k.make_public()
+    return k.generate_url(expires_in=0, query_auth=False)
+
+# create a function to download a file from s3
+def download_file_from_s3(file_name):
+    conn = boto.connect_s3(app.config['S3_ACCESS_KEY'], app.config['S3_SECRET_KEY'])
+    bucket = conn.get_bucket(app.config['S3_BUCKET'])
+    k = boto.s3.key.Key(bucket)
+    k.key = file_name
+    k.get_contents_to_filename(os.path.join(app.config['UPLOAD_PATH'], file_name))
+    return os.path.join(app.config['UPLOAD_PATH'], file_name)
 
 
 @app.route('/convert', methods=['GET', 'POST'])
@@ -70,6 +90,19 @@ def convert():
                                                  output_audio)
                 CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'],
                                                    output_text)
+                # call the upload_file_to_s3 function
+                upload_file_to_s3(VIDEO_FILE)
+                # upload_file_to_s3(output_audio)
+                # upload_file_to_s3(CONVERTED_TEXT_FILE)
+
+                for file in os.listdir(app.config['UPLOAD_PATH']):
+                    if file.endswith(".wav") and file.endswith(".txt"):
+                        upload_file_to_s3(file)
+
+                # call the download_file_from_s3 function
+                download_file = download_file_from_s3(CONVERTED_TEXT_FILE)
+                print(download_file)
+
                 try:
                     clip = mp.VideoFileClip(r"{}".format(VIDEO_FILE))
                     clip.audio.write_audiofile(r"{}".format(OUTPUT_AUDIO_FILE))
@@ -169,10 +202,22 @@ def get_large_audio_transcription(path):
 
 @app.route('/download', methods=['GET', 'POST'])
 def download():
-    return send_file('static/uploads/' + output_text,
-                         attachment_filename='ouptut.txt',
-                         mimetype='text/plain',
-                         as_attachment=True)
+    alert = ""
+    for file in os.listdir(app.config['UPLOAD_PATH']):
+        if file.endswith(".txt"):
+            download_file = download_file_from_s3(output_text)
+            alert = "File downloaded successfully."
+        else:
+            alert = 'No file found.'
+            print("No file found")
+        
+        return send_file(download_file, mimetype= 'text/plain', as_attachment=True)
+    return render_template('convert.html', alert=alert)
+
+    # return send_file('static\\uploads\\' + output_text,
+    #                      attachment_filename='ouptut.txt',
+    #                      mimetype='text/plain',
+    #                      as_attachment=True)
 
 
 @app.route('/')
@@ -294,7 +339,7 @@ def logout():
 #     return send_from_directory(app.config['UPLOAD_PATH'], file_name)
 
 
-@app.route('/sendMessage', methods=['POST'])
+@app.route('/sendMessage', methods=['GET','POST'])
 def sendMessage():
     if request.method == 'POST':
         msg = ''
@@ -313,9 +358,18 @@ def sendMessage():
                 (firstname, lastname, email, message))
             conn.commit()
             msg = 'Message sent successfully !'
+            redirect(url_for('contactus'))
 
         return render_template('contactus.html', title='Contact Us', msg=msg)
 
+# cleaning upload folder
+upload_path = os.path.join(current_dir, 'static\\uploads')
+for files in os.listdir(upload_path):
+    path = os.path.join(upload_path, files)
+    try:
+        shutil.rmtree(path)
+    except OSError:
+        os.remove(path)
 
 if __name__ == '__main__':
     app.run(debug=True)
