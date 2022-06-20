@@ -7,16 +7,19 @@ import speech_recognition as sr
 import moviepy.editor as mp
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
+from pydub.playback import play
 from passlib.hash import sha256_crypt
 from datetime import datetime
 import shutil
+import subprocess
 import io
 from flask_cors import CORS
+import pyttsx3
 
 import boto3
 import boto.s3.connection
 import boto.s3.key
-import auth
+# import auth
 
 
 date = str(datetime.date(datetime.now()))
@@ -37,9 +40,9 @@ app.secret_key = 'your secret key'
 app.config['UPLOAD_EXTENSIONS'] = ['.mp3', '.mp4', '.wav']
 app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
 
-app.config['S3_ACCESS_KEY'] = auth.S3_ACCESS_KEY
-app.config['S3_SECRET_KEY'] = auth.S3_SECRET_KEY
-app.config['S3_BUCKET'] = auth.S3_BUCKET
+# app.config['S3_ACCESS_KEY'] = auth.S3_ACCESS_KEY
+# app.config['S3_SECRET_KEY'] = auth.S3_SECRET_KEY
+# app.config['S3_BUCKET'] = auth.S3_BUCKET
 
 # creating an upload folder
 upload_folder = os.path.join(current_dir, 'static\\uploads')
@@ -51,28 +54,29 @@ if not os.path.isdir(upload_folder):
 
 
 # create a function to upload a file to s3
-def upload_file_to_s3(file_name):
-    conn = boto.connect_s3(app.config['S3_ACCESS_KEY'], app.config['S3_SECRET_KEY'])
-    bucket = conn.get_bucket(app.config['S3_BUCKET'])
-    k = boto.s3.key.Key(bucket)
-    k.key = file_name
-    k.set_contents_from_filename(os.path.join(app.config['UPLOAD_PATH'], file_name))
-    k.make_public()
-    return k.generate_url(expires_in=0, query_auth=False)
+# def upload_file_to_s3(file_name):
+#     conn = boto.connect_s3(app.config['S3_ACCESS_KEY'], app.config['S3_SECRET_KEY'])
+#     bucket = conn.get_bucket(app.config['S3_BUCKET'])
+#     k = boto.s3.key.Key(bucket)
+#     k.key = file_name
+#     k.set_contents_from_filename(os.path.join(app.config['UPLOAD_PATH'], file_name))
+#     k.make_public()
+#     return k.generate_url(expires_in=0, query_auth=False)
 
 # create a function to download a file from s3
-def download_file_from_s3(file_name):
-    conn = boto.connect_s3(app.config['S3_ACCESS_KEY'], app.config['S3_SECRET_KEY'])
-    bucket = conn.get_bucket(app.config['S3_BUCKET'])
-    k = boto.s3.key.Key(bucket)
-    k.key = file_name
-    k.get_contents_to_filename(os.path.join(app.config['UPLOAD_PATH'], file_name))
-    return os.path.join(app.config['UPLOAD_PATH'], file_name)
+# def download_file_from_s3(file_name):
+#     conn = boto.connect_s3(app.config['S3_ACCESS_KEY'], app.config['S3_SECRET_KEY'])
+#     bucket = conn.get_bucket(app.config['S3_BUCKET'])
+#     k = boto.s3.key.Key(bucket)
+#     k.key = file_name
+#     k.get_contents_to_filename(os.path.join(app.config['UPLOAD_PATH'], file_name))
+#     return os.path.join(app.config['UPLOAD_PATH'], file_name)
 
 
 @app.route('/convert', methods=['GET', 'POST'])
 def convert():
     msg = ''
+    converted_text = ''
     if request.method == 'POST':
         file_upload = request.files['upload']
         file_name = file_upload.filename
@@ -90,18 +94,19 @@ def convert():
                                                  output_audio)
                 CONVERTED_TEXT_FILE = os.path.join(app.config['UPLOAD_PATH'],
                                                    output_text)
+                print(CONVERTED_TEXT_FILE)
                 # call the upload_file_to_s3 function
-                upload_file_to_s3(VIDEO_FILE)
+                # upload_file_to_s3(VIDEO_FILE)
                 # upload_file_to_s3(output_audio)
                 # upload_file_to_s3(CONVERTED_TEXT_FILE)
 
-                for file in os.listdir(app.config['UPLOAD_PATH']):
-                    if file.endswith(".wav") and file.endswith(".txt"):
-                        upload_file_to_s3(file)
+                # for file in os.listdir(app.config['UPLOAD_PATH']):
+                #     if file.endswith(".wav") and file.endswith(".txt"):
+                #         upload_file_to_s3(file)
 
                 # call the download_file_from_s3 function
-                download_file = download_file_from_s3(CONVERTED_TEXT_FILE)
-                print(download_file)
+                # download_file = download_file_from_s3(CONVERTED_TEXT_FILE)
+                # print(download_file)
 
                 try:
                     # video_file = download_file_from_s3(app.config['S3_BUCKET'], VIDEO_FILE)
@@ -110,9 +115,23 @@ def convert():
                     clip = mp.VideoFileClip(r"{}".format(VIDEO_FILE))
                     clip.audio.write_audiofile(r"{}".format(OUTPUT_AUDIO_FILE))
                     r = sr.Recognizer()
-                    # audio_clip = sr.AudioFile(r"{}".format(OUTPUT_AUDIO_FILE))
-                    get_large_audio_transcription(
-                        r"{}".format(OUTPUT_AUDIO_FILE))
+                    audio_clip = sr.AudioFile(r"{}".format(OUTPUT_AUDIO_FILE))
+                    # print(get_duration(output_audio))
+                    with audio_clip as source:
+                        audio = r.record(source)
+                    converted_text = r.recognize_google(audio)
+                    with open(CONVERTED_TEXT_FILE, "w") as f:
+                        f.write(converted_text)
+                    # print(converted_text)
+                    # get_large_audio_transcription(
+                    #     r"{}".format(OUTPUT_AUDIO_FILE))
+
+                    if request.form['playText']:
+                        print("Playing text")
+                        engine = pyttsx3.init()
+                        engine.say(converted_text)
+                        engine.runAndWait()
+
                     conn = db.connect('schema.db')
                     title = file_name.split('.')[0]
                     audio_title = title + '.wav'
@@ -145,7 +164,13 @@ def convert():
 
                 except Exception as e:
                     msg = 'Error in converting speech to text. {}'.format(e)
-    return render_template('convert.html', msg=msg, user = session['username'])
+        if 'playTEXT' in request.form:
+            print("Playing text")
+            engine = pyttsx3.init()
+            engine.say(converted_text)
+            engine.runAndWait()
+    # return render_template('convert.html', msg=msg, user = session['username'], converted_text=converted_text)
+    return render_template('convert.html', converted_text=converted_text)
             
 
 
@@ -208,13 +233,17 @@ def download():
     alert = ""
     for file in os.listdir(app.config['UPLOAD_PATH']):
         if file.endswith(".txt"):
-            download_file = download_file_from_s3(output_text)
+            # download_file = download_file_from_s3(output_text)
             alert = "File downloaded successfully."
         else:
             alert = 'No file found.'
             print("No file found")
         
-        return send_file(download_file, mimetype= 'text/plain', as_attachment=True)
+        # return send_file(download_file, mimetype= 'text/plain', as_attachment=True)
+        return send_file('static\\uploads\\' + output_text,
+                         attachment_filename='ouptut.txt',
+                         mimetype='text/plain',
+                         as_attachment=True)
     return render_template('convert.html', alert=alert)
 
     # return send_file('static\\uploads\\' + output_text,
@@ -222,6 +251,19 @@ def download():
     #                      mimetype='text/plain',
     #                      as_attachment=True)
 
+@app.route('/playText', methods=['GET', 'POST'])
+def playText():
+    audio_file = os.path.join(app.config['UPLOAD_PATH'], output_audio)
+    converted_text = os.path.join(app.config['UPLOAD_PATH'], output_text)
+    alert = ""
+    try:
+    # text to speech
+        text = AudioSegment.from_wav(r"{}".format(audio_file))
+        play(text)
+
+    except Exception as e:
+        alert = 'Unable to read text. {}'.format(e)
+    return render_template('convert.html', alert=alert)
 
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
@@ -334,7 +376,7 @@ def logout():
         shutil.rmtree(folder_name)
 
     flash('You are logged out')
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 
 # @app.route('/uploads/<file_name>')
@@ -364,6 +406,11 @@ def sendMessage():
             redirect(url_for('contactus'))
 
         return render_template('contactus.html', title='Contact Us', msg=msg)
+
+# #getting file duration
+# def get_duration(filename):
+#     result = subprocess.run(['ffprobe', '-v', 'error', '-show_entries', 'format=duration', '-of', 'default=noprint_wrappers=1:nokey=1', filename], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+#     return float(result.stdout)
 
 # cleaning upload folder
 upload_path = os.path.join(current_dir, 'static\\uploads')
