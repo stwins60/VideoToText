@@ -8,7 +8,8 @@ services:
     links:
       - db
     ports:
-      - "5001:5000"
+      - "5000:5000"
+      - "5001:5001"
   
   db:
     image: mysql:5.7
