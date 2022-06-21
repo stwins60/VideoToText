@@ -439,4 +439,4 @@ for files in os.listdir(upload_path):
 #     k.get_contents_to_filename(file_name)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
