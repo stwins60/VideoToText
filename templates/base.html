@@ -2,8 +2,15 @@
 <title>{% block title %}{% endblock %}Project Factor</title>
 
 <link rel="stylesheet" href="{{ url_for('static', filename='design.css') }}"/>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+<script defer src="https://pyscript.net/alpha/pyscript.js"></script> -->
 
 {% block header %}{% endblock %}
+<div class="homepage">
+    {% block div %}{% endblock %}
 <section class="conversion-controls">
     {% block content %}{% endblock %}
 </section>
+<section class="conversion-display">
+    {% block section %}{% endblock %}

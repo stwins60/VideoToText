@@ -6,24 +6,46 @@
     <a href="{{ url_for('convert') }}">Convert</a>
     <a href="{{ url_for('contactus') }}">Contact us</a>
 </nav>
-<h3 style="text-align: right;">Welcome, {{user}}</h3>
+<!-- <h3 style="text-align: right;">Welcome, {{user}}</h3> -->
 <h2 style="text-align: center;">Video to Text Transcript Convertor!</h2>
-<p style="text-align: center;">Text transcript only a few clicks away.</p>
+<!-- <p style="text-align: center;">Text transcript only a few clicks away.</p><br><br><br><br> -->
 {% endblock %}
 {% block content %}
-<section class="form">
+<div class="convert_form">
     <form method="post" action="{{ url_for('convert')}}" enctype="multipart/form-data">
-        <input type="file" name="upload"/>
-        <p><input type="submit" class="button" value="Upload & Convert"/></p>
-        <button type="button" class="button" onclick="window.location.href='{{ url_for('download') }}';">Download</button>
+        <br><input type="file" name="upload"/>
+        <p><input type="submit" class="convert_btn" value="Upload & Convert"/></p>
+        <textarea name="text" class="text_display" rows="10" cols="50">Converted Text: {{ converted_text }}</textarea><br><br>
+        <button type="button" class="convert_btn" onclick="window.location.href='{{ url_for('download') }}';">Download</button>
+        <h2 style="text-align: center;">Play your converted text</h2>
+        <button type="submit" class="convert_btn" id="text" name="playText" onclick="speak()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="150" height="120" fill="currentColor" class="bi bi-play-btn" viewBox="0 0 16 16">
+                <path d="M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/>
+                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm15 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+            </svg>
+            
+        </button>
+        <!-- <pyscript>
+            import pyttsx3
+            engine = pyttsx3.init()
+            engine.setProperty('rate', 150)
+            engine.setProperty('volume', 1)
+            engine.setProperty('voice', 'english')
+
+            text = "{{ converted_text }}"
+            engine.say(text)
+
+        </pyscript> -->
         <!-- <button type="button" onclick="Preview(); ">Convert</button>
         <button type="button" onclick="Preview();" disabled>Preview</button>
         <button type="button" disabled>Download</button> -->
     </form>
-</section>
+</div>
     <h1 style="text-align: center;">{{msg}}</h1>
+{% endblock %}
+{% block section %}
 <section class="form"> <!-- I know using inline style is garbage. This is temporary. -->
-    <h1 style="text-align: center;">Videos</h1>
+    <!-- <br><br><br><br><h1 style="text-align: center;">Videos</h1>
         <p>
             <article>
                 <img src="{{ url_for('static', filename='/images/videos/cat-1.jpg') }}" alt="Cat outdoors" style="max-width: 100px"/>
@@ -33,7 +55,7 @@
             <article>
                 <img src="{{ url_for('static', filename='/images/videos/cat-2.jpg') }}" alt="The lives of savannah cats" style="max-width: 100px"/>
             </article>
-        </p>
-    <button type="button" onclick="window.location.href='{{ url_for( 'logout') }}';" class="button">Logout</button>
+        </p> -->
+    <!-- <button type="button" onclick="window.location.href='{{ url_for( 'logout') }}';" class="convert_btn">Logout</button> -->
 </section>
 {% endblock %}

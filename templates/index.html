@@ -4,17 +4,21 @@
 <title>{{title}}</title>
 <nav class = "topnav">
     <a href="{{ url_for('index') }}">Home</a>
-    <a href="{{ url_for('login') }}">Login</a>
-    <a href="{{ url_for('signup') }}">Register</a>
+    <a href="{{ url_for('convert') }}">About</a>
+    <!-- <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('signup') }}">Register</a> -->
     <a href="{{ url_for('contactus') }}">Contact us</a>
 </nav>
 {% endblock %}
-{% block content %}
+{% block div %}
 
 <section class="home">
     <h1 style="font-size:350%;">TEEM</h1>
     <h2 style="font-size:300%;">Video to Text Transcript Convertor!</h2>
-    <p style="font-size:160%;">Text transcript a few click away.</p>
+    <p style="font-size:160%; text-align: center;">Text transcript a few click away.</p>
+    <p style="font-size:160%;">
+        <a class="convert_redirect" href="{{ url_for('convert') }}">Convert</a>
+    </p>
 </section>
 
 {% endblock %}

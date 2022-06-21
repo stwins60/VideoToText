@@ -30,3 +30,4 @@ SpeechRecognition==3.8.1
 tqdm==4.62.0
 urllib3==1.26.6
 Werkzeug==2.0.1
+pyttsx3
