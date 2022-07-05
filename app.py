@@ -44,6 +44,7 @@ app.config['UPLOAD_PATH'] = os.path.join(current_dir, 'static\\uploads')
 # app.config['S3_SECRET_KEY'] = auth.S3_SECRET_KEY
 # app.config['S3_BUCKET'] = auth.S3_BUCKET
 
+
 # creating an upload folder
 upload_folder = os.path.join(current_dir, 'static\\uploads')
 
@@ -251,19 +252,18 @@ def download():
     #                      mimetype='text/plain',
     #                      as_attachment=True)
 
-@app.route('/playText', methods=['GET', 'POST'])
+@app.route('/playText', methods=['GET'])
 def playText():
-    audio_file = os.path.join(app.config['UPLOAD_PATH'], output_audio)
-    converted_text = os.path.join(app.config['UPLOAD_PATH'], output_text)
     alert = ""
-    try:
-    # text to speech
-        text = AudioSegment.from_wav(r"{}".format(audio_file))
-        play(text)
+    for file in os.listdir(app.config['UPLOAD_PATH']):
+        try:
+            if file.endswith(".wav"):
+               text = AudioSegment.from_wav(r"{}".format(file))
+               play(text)
 
-    except Exception as e:
-        alert = 'Unable to read text. {}'.format(e)
-    return render_template('convert.html', alert=alert)
+        except Exception as e:
+            alert = 'Unable to read text. {}'.format(e)
+        return render_template('convert.html', alert=alert)
 
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])

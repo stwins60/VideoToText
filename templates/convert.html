@@ -11,6 +11,7 @@
 <!-- <p style="text-align: center;">Text transcript only a few clicks away.</p><br><br><br><br> -->
 {% endblock %}
 {% block content %}
+<py-script src = "/app.py"></py-script>
 <div class="convert_form">
     <form method="post" action="{{ url_for('convert')}}" enctype="multipart/form-data">
         <br><input type="file" name="upload"/>
@@ -18,7 +19,7 @@
         <textarea name="text" class="text_display" rows="10" cols="50">Converted Text: {{ converted_text }}</textarea><br><br>
         <button type="button" class="convert_btn" onclick="window.location.href='{{ url_for('download') }}';">Download</button>
         <h2 style="text-align: center;">Play your converted text</h2>
-        <button type="submit" class="convert_btn" id="text" name="playText" onclick="speak()">
+        <button type="button" class="convert_btn" id="playText">
             <svg xmlns="http://www.w3.org/2000/svg" width="150" height="120" fill="currentColor" class="bi bi-play-btn" viewBox="0 0 16 16">
                 <path d="M6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/>
                 <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4zm15 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>

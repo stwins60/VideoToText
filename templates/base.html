@@ -3,8 +3,13 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='design.css') }}"/>
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-<!-- <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
-<script defer src="https://pyscript.net/alpha/pyscript.js"></script> -->
+<link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css" />
+<!-- <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+<py-script src = "{{ url_for('static', filename='script.js') }}"></py-script> -->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"> </script>
+<script type=text/javascript> $(function() { $("#playTest").click(function (event) { $.getJSON('/playTest', { },
+    function(data) { }); return false; }); }); </script>
+
 
 {% block header %}{% endblock %}
 <div class="homepage">
