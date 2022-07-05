@@ -20,7 +20,7 @@ deploy:
     file: docker-compose.yml
     services:
       - frontend
-      - db
+#       - db
 
 # The dependencies section defines other git repositories to be deployed as part of your development environment
 # More info: https://www.okteto.com/docs/reference/manifest/#dependencies
@@ -31,19 +31,19 @@ deploy:
 # The dev section defines how to activate a development container
 # More info: https://www.okteto.com/docs/reference/manifest/#dev
 dev:
-  db:
-    command: bash
-    workdir: /usr/src/app
-    sync:
-      - db:/usr/src/app
-    forward:
-      - 3306:3306
-      - 33060:33060
-      - 3307:3306
-    reverse:
-      - 9000:9000
-    volumes:
-      - /root/.cache/pip
+#   db:
+#     command: bash
+#     workdir: /usr/src/app
+#     sync:
+#       - db:/usr/src/app
+#     forward:
+#       - 3306:3306
+#       - 33060:33060
+#       - 3307:3306
+#     reverse:
+#       - 9000:9000
+#     volumes:
+#       - /root/.cache/pip
   frontend:
     command: bash
     workdir: /app
@@ -51,7 +51,6 @@ dev:
       - .:/app
     forward:
       - 5000:5000
-      - 5001:5000
     reverse:
       - 9000:9000
     volumes:
