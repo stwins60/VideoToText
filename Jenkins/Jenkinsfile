@@ -1,7 +1,6 @@
 pipeline{
-    agent any{
-        label "master"
-    }
+    agent any
+    
     environment{
         DOCKERHUB_USERNAME="${DOCKERHUB_USERNAME}"
         DOCKERHUB_PASSWORD="${DOCKERHUB_PASSWORD}"
