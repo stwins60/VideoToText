@@ -14,7 +14,7 @@ pipeline{
         }
         stage('Test'){
             steps{
-                sh 'winpty docker run -it ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER} /bin/bash'
+                sh 'docker run -it ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}'
             }
         }
         stage('Deploy'){
