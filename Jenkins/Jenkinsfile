@@ -14,7 +14,7 @@ pipeline{
         }
         stage('Test'){
             steps{
-                sh 'docker run -it ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}'
+                sh 'docker run -p 5000:5000 ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}'
             }
         }
         stage('Deploy'){
