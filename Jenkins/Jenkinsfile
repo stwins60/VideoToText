@@ -18,7 +18,10 @@ pipeline{
             }
         }
         stage('Deploy'){
-            steps{
+//             steps{
+//                 sh 'docker push ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}'
+//             }
+            docker.withRegistry("${DOCKERHUB_USERNAME}", "${DOCKERHUB_PASSWORD}"){
                 sh 'docker push ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}'
             }
         }
