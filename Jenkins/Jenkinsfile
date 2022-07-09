@@ -17,13 +17,18 @@ pipeline{
                 sh 'docker run -p 5000:5000 ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}'
             }
         }
+        stage('Login to DockerHub'){
+            steps{
+                sh 'docker login -u ${DOCKERHUB_USERNAME} ${DOCKERHUB_PASSWORD}'
+            }
+        }
         stage('Deploy'){
-//             steps{
-//                 sh 'docker push ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}'
-//             }
-            docker.withRegistry("${DOCKERHUB_USERNAME}", "${DOCKERHUB_PASSWORD}"){
+            steps{
                 sh 'docker push ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}'
             }
+//             docker.withRegistry("${DOCKERHUB_USERNAME}", "${DOCKERHUB_PASSWORD}"){
+//                 sh 'docker push ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}'
+//             }
         }
 
         stage('Destroy Docker Container'){
@@ -35,6 +40,9 @@ pipeline{
         stage('Deploy to Kubernetes'){
             steps{
                 sh 'kubectl apply -f k8s'
+            }
+            steps{
+                sh 'kubectl show deploy'
             }
         }
     }
