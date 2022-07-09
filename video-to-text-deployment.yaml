@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: video-to-text
+spec:
+  selector:
+    matchLabels:
+      app: video-to-text
+  template:
+    metadata:
+      labels:
+        app: video-to-text
+    spec:
+      
+      containers:
+      - name: flask-api
+        image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}
+        resources:
+          limits:
+            memory: "200Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 5000
