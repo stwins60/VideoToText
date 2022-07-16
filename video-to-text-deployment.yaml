@@ -13,8 +13,9 @@ spec:
     spec:
       
       containers:
-      - name: flask-api
-        image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}
+      - name: video-to-text
+#         image: ${DOCKERHUB_USERNAME}/${DOCKERHUB_REPO}:${BUILD_NUMBER}
+        image: 757445073296.dkr.ecr.us-east-1.amazonaws.com/video-text
         resources:
           limits:
             memory: "200Mi"
