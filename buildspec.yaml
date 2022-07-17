@@ -16,6 +16,9 @@ phases:
       - TAG="$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
       - echo Logging in to Amazon EKS...
       - aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $AWS_CLUSTER_NAME
+      # Login to ECR Registry for docker to push the image to ECR Repository
+      - echo "Login in to Amazon ECR..."
+      - $(aws ecr get-login --no-include-email)
   build:
     commands:
       # Push Docker Image to ECR Repository
