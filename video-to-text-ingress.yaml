@@ -12,4 +12,4 @@ spec:
             service:
               name: video-to-text
               port:
-                number: 5000
+                number: 5001
