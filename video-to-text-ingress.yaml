@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: video-to-text-ingress
+  namespace: video-to-text
+spec:
+  rules:
+  - http:
+      paths:
+        - path: /video-to-text
+          pathType: Prefix
+          backend:
+            service:
+              name: video-to-text
+              port:
+                number: 5000
