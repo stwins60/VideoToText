@@ -33,4 +33,4 @@ phases:
       - echo Push the latest image to cluster
       - kubectl apply -f video-to-text-deployment.yaml
       - kubectl apply -f video-to-text-svc.yaml 
-      - kubectl aooly -f video-to-text-ingress.yaml
+      - kubectl apply -f video-to-text-ingress.yaml
