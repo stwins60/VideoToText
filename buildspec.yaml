@@ -19,7 +19,7 @@ phases:
       # Login to ECR Registry for docker to push the image to ECR Repository
       - echo "Login in to Amazon ECR..."
       - $(aws ecr get-login --no-include-email)
-      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      
   build:
     commands:
       - echo "Push Docker Image to ECR Repository"
@@ -27,13 +27,15 @@ phases:
 #       - echo "Tagging the Docker image"
 #       - docker tag video-to-text:latest $REPOSITORY_URI:$TAG
       - echo "Build completed on `date`"
+      - echo "Login in to docker"
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - echo "Pushing the Docker image to ECR Repository"
       - docker push $REPOSITORY_URI:$TAG
       - echo "Docker Image Push to ECR Completed -  $REPOSITORY_URI:$TAG"     
   post_build:
     commands:
-      - echo "Exiting if a build fails"
-      - bash -c "if [ /"$CODEBUILD_BUILD_SUCCEEDING/" == /"0/" ]; then exit 1; fi"
+#       - echo "Exiting if a build fails"
+#       - bash -c "if [ /"$CODEBUILD_BUILD_SUCCEEDING/" == /"0/" ]; then exit 1; fi"
       - echo Entered the build phase...
       - echo Change directory to secondary source
       - cd $CODEBUILD_SRC_DIR
