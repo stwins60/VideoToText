@@ -19,7 +19,7 @@ phases:
       # Login to ECR Registry for docker to push the image to ECR Repository
       - echo "Login in to Amazon ECR..."
       - $(aws ecr get-login --no-include-email)
-      -aws ecr get-login-password --region <your region> | docker login --username AWS --password-stdin ACCOUNT.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin ACCOUNT.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
       - echo "Push Docker Image to ECR Repository"
