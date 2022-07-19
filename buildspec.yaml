@@ -25,7 +25,7 @@ phases:
       - echo "Push Docker Image to ECR Repository"
       - docker build -t $REPOSITORY_URI:$TAG .
 #       - echo "Tagging the Docker image"
-#       - docker tag video-to-text:latest $REPOSITORY_URI:$TAG
+      # - docker tag video-to-text:latest $REPOSITORY_URI:$TAG
       - echo "Build completed on `date`"
       - echo "Login in to docker"
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
