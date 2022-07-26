@@ -12,10 +12,30 @@ phases:
   pre_build:
     commands:
       - echo Entered the pre_build phase...
+      # Docker Image Tag with Date Time & Code Buiild Resolved Source Version
+      - TAG="$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
       - echo Logging in to Amazon EKS...
       - aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name $AWS_CLUSTER_NAME
+      # Login to ECR Registry for docker to push the image to ECR Repository
+      - echo "Login in to Amazon ECR..."
+      - $(aws ecr get-login --no-include-email)
+      
   build:
     commands:
+      - echo "Push Docker Image to ECR Repository"
+      - docker build -t $REPOSITORY_URI:$TAG .
+#       - echo "Tagging the Docker image"
+      # - docker tag video-to-text:latest $REPOSITORY_URI:$TAG
+      - echo "Build completed on `date`"
+      - echo "Login in to docker"
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - echo "Pushing the Docker image to ECR Repository"
+      - docker push $REPOSITORY_URI:$TAG
+      - echo "Docker Image Push to ECR Completed -  $REPOSITORY_URI:$TAG"     
+  post_build:
+    commands:
+#       - echo "Exiting if a build fails"
+#       - bash -c "if [ /"$CODEBUILD_BUILD_SUCCEEDING/" == /"0/" ]; then exit 1; fi"
       - echo Entered the build phase...
       - echo Change directory to secondary source
       - cd $CODEBUILD_SRC_DIR
@@ -24,3 +44,4 @@ phases:
       - echo Push the latest image to cluster
       - kubectl apply -f video-to-text-deployment.yaml
       - kubectl apply -f video-to-text-svc.yaml 
+      - kubectl apply -f video-to-text-ingress.yaml
