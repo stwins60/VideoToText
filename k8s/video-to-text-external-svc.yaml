@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: video-to-text-external-svc
+spec:
+  selector:
+    app: video-to-text
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 5000
+    nodePort: 32710

@@ -4,3 +4,5 @@ auth.py
 __pycache__
 static/uploads/
 __pycache__/app.cpython-39.pyc
+.terraform**
+terraform.tfstate*

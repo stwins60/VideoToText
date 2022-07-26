@@ -4,12 +4,13 @@ metadata:
   name: video-to-text-ingress
 spec:
   rules:
-  - http:
+  - host: developersfrat.com
+    http:
       paths:
         - path: /video-to-text
           pathType: Prefix
           backend:
             service:
-              name: video-to-text
+              name: video-to-text-external-svc
               port:
-                number: 5001
+                number: 8080
